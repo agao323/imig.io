@@ -1,7 +1,8 @@
 var fs = require('fs'),
     path = require('path'),
     sidebar = require('../helpers/sidebar'),
-    Models = require('../models');
+    Models = require('../models'),
+    MD5 = require('MD5');
 
 
 module.exports = {
@@ -98,9 +99,54 @@ module.exports = {
     },
 
     like: function(req, res) {
-        res.json({likes: 1});
+
+        // search for a matching image in the db
+        Models.Image.findOne({ filename: { $regex: req.params.image_id }},
+            function(err, image) {
+                if (!err && image) {
+
+                    // if a valid image is found, increment likes and save it
+                    image.likes++; 
+                    image.save(function(err) {
+                        if (err) { 
+                            res.json(err);
+                        } else {
+
+                            // if saving it doesn't return an error, simply
+                            // send a JSON object with the correct number of likes
+                            // back to the browser
+                            res.json({ likes: image.likes });
+                        }
+                    });
+                }
+            });
     },
-    comment: function(req, res) {
-        res.send('The image:comment POST controller');
+
+
+    comment: function(request, response) {
+
+        // find the image
+        Models.Image.findOne({ filename: { $regex: request.params.image_id }},
+            function(err, image) {
+                if (!err && image) {
+
+                    var newComment = new Models.Comment(request.body);
+
+                    console.log(request.body);
+
+                    newComment.gravatar = MD5(newComment.email);
+                    newComment.image_id = image._id;
+                    newComment.save(function(err, comment) {
+                        if (err) { throw err; }
+                        response.redirect('/images/' + image.uniqueId + '#THE_COMMENT_ID_IS:$' + comment._id);
+                    });
+                } else {
+                    response.redirect('/');
+                } 
+            });
     }
 };
+
+
+
+
