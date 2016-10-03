@@ -1,3 +1,4 @@
+// require all the necessary modules to import 
 var fs = require('fs'),
     path = require('path'),
     sidebar = require('../helpers/sidebar'),
@@ -6,6 +7,8 @@ var fs = require('fs'),
 
 
 module.exports = {
+
+    // for the page rendering of a single image
 	index: function(req, res) {
         // instantiate an empty viewModel object to hold an image and comments
         var viewModel = {
@@ -47,6 +50,7 @@ module.exports = {
             });
     },
 
+    // see routes.js - posts image.create
     create: function(req, res) {
         var saveImage = function() {
             var possible = 'abcdefghijklmnopqrstuvwxyz0123456789', 
@@ -98,6 +102,7 @@ module.exports = {
         saveImage();
     },
 
+    // same as create
     like: function(req, res) {
 
         // search for a matching image in the db
@@ -122,7 +127,7 @@ module.exports = {
             });
     },
 
-
+    // same as create
     comment: function(request, response) {
 
         // find the image
@@ -130,10 +135,13 @@ module.exports = {
             function(err, image) {
                 if (!err && image) {
 
+                    // create a new comment model with the whole comment body 
+                    // passed in as a parameter to the constructor 
                     var newComment = new Models.Comment(request.body);
 
                     console.log(request.body);
 
+                    // set the gravatar and link the comment's image_id to the image's id
                     newComment.gravatar = MD5(newComment.email);
                     newComment.image_id = image._id;
                     newComment.save(function(err, comment) {
