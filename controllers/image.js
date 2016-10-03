@@ -152,7 +152,40 @@ module.exports = {
                     response.redirect('/');
                 } 
             });
+    },
+
+    remove: function(request, response) {
+        Models.Image.findOne({ filename: { $regex: request.params.image_id } },
+            function(err, image) {
+                if (err) { throw err; }
+
+                // delete the file associated with the image
+                fs.unlink(path.resolve('./public/upload/' + image.filename),
+                    function(err) {
+                        if (err) { throw err; }
+
+                        // remove the comments associated with the image
+                        Models.Comment.remove({ image_id: image._id},
+                            function(err) {
+                                image.remove(function(err) {
+
+                                    // if removing was successful, send
+                                    // a true boolean value back to browser
+                                    if (!err) {
+                                        response.json(true);
+                                    } else {
+                                        response.json(false);
+                                    }
+                                });
+                        });
+                });
+            });
     }
+
+//// the pathnames to the sweetalert css stylesheet and js file
+// node_modules/sweetalert/dist/sweetalert.css
+// node_modules/sweetalert/dist/sweetalert.min.js
+
 };
 
 

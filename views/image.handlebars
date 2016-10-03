@@ -12,11 +12,19 @@
 
     <div class="panel-footer">
         <div class="row">
+
             <div class="col-md-8">
                 <button class="btn btn-success" id="btn-like" data-id="{{ image.uniqueId }}"><i class="fa fa-heart"> Like</i></button>
                 <strong class="likes-count">{{ image.likes }}</strong> &nbsp; - &nbsp; <i class="fa fa-eye"></i> <strong>{{ image.views }}</strong>
                 &nbsp; - &nbsp; Posted: <em class="text-muted">{{ timeago image.timestamp }}</em>
             </div>
+
+            <div class="col-md-4 text-right">
+                <button class="btn btn-danger" id="btn-delete" data-id="{{ image.uniqueId }}"> Delete Image
+                <i class="fa fa-times"></i>
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
